@@ -1,0 +1,61 @@
+[project]
+name = "test-payments-processor"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.18.4",
+    "asyncpg>=0.31.0",
+    "fastapi[standard]>=0.138.0",
+    "sqlalchemy>=2.0.51",
+]
+
+[dependency-groups]
+dev = [
+    "isort>=8.0.1",
+    "ruff>=0.15.19",
+    "ty>=0.0.52",
+]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+target-version = "py314"
+exclude = [
+    ".venv",
+    "migrations"
+]
+
+[tool.ruff.lint]
+preview = true
+select = ["E", "F", "B", "COM", "N", "Q", "LOG", "G", "RET", "I", "ANN"]
+ignore = ["E203", "I001"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+use_parentheses = true
+line_length = 88
+skip = [
+    ".venv",
+    "migrations"
+]
+
+[tool.ty.src]
+exclude = [
+    ".venv",
+    "migrations"
+]
+
+[tool.pytest.ini_options]
+asyncio_default_test_loop_scope = "session"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_mode = "auto"

@@ -1,0 +1,42 @@
+FROM python:3.14-slim-trixie
+
+USER root
+
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    zsh \
+    nodejs \
+    openssh-client
+
+RUN curl -fsSL https://opencode.ai/install | bash
+RUN echo 'export PATH=/root/.opencode/bin:$PATH' >> /root/.zshrc
+
+RUN curl -sS https://starship.rs/install.sh | sh -s -- -y
+RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc
+RUN echo 'eval "$(starship init zsh)"' >> /root/.zshrc
+COPY .devcontainer/starship.toml /root/.config/starship.toml
+
+
+RUN git config --global user.name "" && \
+    git config --global user.email "" && \
+    git config --global init.defaultBranch main && \
+    git config --global credential.helper store
+
+
+WORKDIR /test-payments-processor
+ENV PYTHONPATH="/test-payments-processor"
+
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+RUN mkdir -p /root/.ssh
+COPY .ssh/ /root/.ssh/
+RUN chmod 700 /root/.ssh
+RUN chmod 600 /root/.ssh/*
+
+COPY .. .

@@ -1,0 +1,31 @@
+add_newline = false
+
+format = "$python$directory$character"
+
+[character]
+success_symbol = "[➜](bold)"
+error_symbol = "[➜](bold red)"
+
+[directory]
+style = "bright-green"
+truncation_length = 3
+
+[python]
+format = " [$virtualenv]($style) "
+style = "white"
+
+
+[git_branch]
+disabled = true
+
+[git_status]
+disabled = true
+
+[package]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[docker_context]
+disabled = true

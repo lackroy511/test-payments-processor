@@ -1,0 +1,42 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-docker-compose
+{
+	"name": "test-payments-processor",
+	"dockerComposeFile": [
+		"docker-compose.dev.yml"
+	],
+	"service": "test-payments-processor",
+	"workspaceFolder": "/test-payments-processor",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"charliermarsh.ruff",
+				"astral-sh.ty",
+				"njpwerner.autodocstring",
+				"streetsidesoftware.code-spell-checker",
+				"naumovs.color-highlight",
+				"dbaeumer.vscode-eslint",
+				"eamodio.gitlens",
+				"glenn2223.live-sass",
+				"christian-kohler.npm-intellisense",
+				"peakchen90.open-html-in-browser",
+				"christian-kohler.path-intellisense",
+				"esbenp.prettier-vscode",
+				"SeeLog.python-init-generator",
+				"littlefoxteam.vscode-python-test-adapter",
+				"njqdev.vscode-python-typehint",
+				"mechatroner.rainbow-csv",
+				"streetsidesoftware.code-spell-checker-russian",
+				"syler.sass-indented",
+				"mtxr.sqltools",
+				"mtxr.sqltools-driver-pg",
+				"mtxr.sqltools-driver-mssql",
+				"mtxr.sqltools-driver-sqlite",
+				"ms-vscode.test-adapter-converter",
+				"hbenl.vscode-test-explorer",
+				"redhat.vscode-yaml",
+				"sst-dev.opencode"
+			]
+		}
+	}
+}

@@ -1,0 +1,40 @@
+services:
+  test-payments-processor:
+    container_name: test-payments-processor-dev
+    build:
+      context: ..
+      dockerfile: .devcontainer/dockerfile.dev
+    command: tail -f /dev/null
+    volumes:
+      - ..:/test-payments-processor
+      - /home/main/.local/share/opencode/auth.json:/root/.local/share/opencode/auth.json
+      - /home/main/.config/opencode:/root/.config/opencode
+    env_file:
+      - ../.env
+
+  payments_processor_db:
+    image: postgres:18
+    container_name: test-payments-processor-db-dev
+    env_file:
+      - ../.env
+    volumes:
+      - test-payments-processor-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbit:
+    image: rabbitmq:4.3.2-management
+    container_name: test-payments-processor-rabbit-dev
+    ports:
+      - 15672:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    env_file:
+      - ../.env
+
+volumes:
+  test-payments-processor-db:
+  rabbitmq_data:
