@@ -13,9 +13,9 @@ log = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     try:
-        log.info("Auth API is starting...")
+        log.info("Payments API is starting...")
         configure_logging()
         yield
     finally:
-        log.info("Auth API is shutting down...")
+        log.info("Payments API is shutting down...")
         await sql_alchemy_engine.dispose()

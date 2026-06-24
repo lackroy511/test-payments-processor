@@ -3,4 +3,16 @@
     "terminal.integrated.env.linux": {
         "PYTHONPATH": "${workspaceFolder}"
     },
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "payments_processor_db",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "payments_db",
+            "database": "payments_processor_db",
+            "username": "app"
+        }
+    ],
 }

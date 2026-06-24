@@ -1,11 +1,14 @@
-from decimal import Decimal
-from src.core.db.base import Base
 from datetime import datetime
+from decimal import Decimal
 from enum import Enum
 
-from sqlalchemy import DateTime, Enum as SAEnum, Numeric, String, Text
+from sqlalchemy import DateTime
+from sqlalchemy import Enum as SAEnum
+from sqlalchemy import Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
+
+from src.core.db.base import Base
 
 
 class Currency(str, Enum):
@@ -27,7 +30,7 @@ class Payment(Base):
         Numeric(precision=14, scale=2),
     )
     currency: Mapped[Currency] = mapped_column(
-        SAEnum(Currency, length=3, create_constraint=False),
+        SAEnum(Currency),
         index=True,
     )
     description: Mapped[str | None] = mapped_column(
@@ -36,10 +39,9 @@ class Payment(Base):
     )
     meta_data: Mapped[dict | None] = mapped_column(
         JSONB,
-        nullable=True,
     )
     status: Mapped[PaymentStatus] = mapped_column(
-        SAEnum(PaymentStatus, length=10, create_constraint=False),
+        SAEnum(PaymentStatus),
         index=True,
         default=PaymentStatus.PENDING,
     )
@@ -50,6 +52,37 @@ class Payment(Base):
     )
     webhook_url: Mapped[str] = mapped_column(
         Text,
+    )
+    processed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+
+class OutboxMessageStatus(str, Enum):
+    PENDING = "pending"
+    PUBLISHED = "published"
+
+
+class OutboxMessageType(str, Enum):
+    PAYMENT_CREATED = "payment.created"
+
+
+class OutboxMessage(Base):
+    __tablename__ = "outbox_messages"
+
+    event_type: Mapped[OutboxMessageType] = mapped_column(
+        SAEnum(OutboxMessageType),
+        index=True,
+        default=OutboxMessageType.PAYMENT_CREATED,
+    )
+    status: Mapped[OutboxMessageStatus] = mapped_column(
+        SAEnum(OutboxMessageStatus),
+        index=True,
+        default=OutboxMessageStatus.PENDING,
+    )
+    payload: Mapped[dict] = mapped_column(
+        JSONB,
     )
     processed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
