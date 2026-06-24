@@ -1,10 +1,10 @@
 {
     "configurations": [
         {
-            "name": "Run project",
+            "name": "Run api",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/main.py",
+            "program": "${workspaceFolder}/src/payments_api/main.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
         }
