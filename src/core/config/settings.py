@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     db_host: str
     db_port: int
 
+    access_api_key: str
+
     @computed_field
     @property
     def db_url(self) -> str:
