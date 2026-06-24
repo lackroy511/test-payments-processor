@@ -4,8 +4,8 @@ from uuid import UUID
 
 from fastapi import Depends
 from sqlalchemy import insert, select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.base import get_db_session
 from src.core.db.models import OutboxMessage, Payment

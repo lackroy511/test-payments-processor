@@ -19,7 +19,7 @@ router = APIRouter(prefix="/v1/payments", tags=["Payments"])
 @router.post("/", status_code=202, response_model=CreatePaymentResponse)
 async def create_payment(
     body: CreatePaymentRequest,
-    idempotency_key: Annotated[str, Header()],
+    idempotency_key: Annotated[str, Header(alias="Idempotency-Key")],
     service: Annotated[PaymentService, Depends(get_payment_service)],
 ) -> CreatePaymentResponse:
     payment = await service.create_payment(

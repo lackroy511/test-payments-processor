@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     db_port: int
 
     access_api_key: str
+    access_api_name: str = "X-API-Key"
 
     @computed_field
     @property

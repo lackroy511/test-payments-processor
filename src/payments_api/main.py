@@ -1,13 +1,11 @@
 import logging
-from typing import Callable
 
-from fastapi import FastAPI, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi import Depends, FastAPI
 
 from src.core.config.lifespan import lifespan
-from src.core.config.settings import settings
-from src.payments_api.common.exc.handlers import register_exception_handlers
 from src.payments_api.api.router import router as main_router
+from src.payments_api.common.deps.api_key import verify_api_key
+from src.payments_api.common.exc.handlers import register_exception_handlers
 
 log = logging.getLogger(__name__)
 
@@ -19,23 +17,8 @@ app = FastAPI(
     version="0.0.1",
     lifespan=lifespan,
 )
-app.include_router(main_router)
+app.include_router(main_router, dependencies=[Depends(verify_api_key)])
 register_exception_handlers(app)
-
-
-@app.middleware("http")
-async def check_api_key(request: Request, call_next: Callable) -> Response:
-    if request.url.path.startswith("/api/payments/doc/"):
-        return await call_next(request)
-
-    api_key = request.headers.get("X-API-Key")
-    if not api_key or settings.access_api_key != api_key:
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "X-API-Key is required or invalid"},
-        )
-
-    return await call_next(request)
 
 
 if __name__ == "__main__":
