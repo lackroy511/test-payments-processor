@@ -6,11 +6,9 @@ from src.core.config.settings import settings
 
 log = logging.getLogger(__name__)
 
-print(settings.base_dir)
-
 
 if not os.path.exists(settings.base_dir.parent / "logs"):
-    os.mkdir("logs")
+    os.mkdir(settings.base_dir.parent / "logs")
 
 
 def configure_logging() -> None:

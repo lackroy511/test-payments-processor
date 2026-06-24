@@ -8,6 +8,7 @@ dependencies = [
     "alembic>=1.18.4",
     "asyncpg>=0.31.0",
     "fastapi[standard]>=0.138.0",
+    "faststream[rabbit]>=0.7.0",
     "sqlalchemy>=2.0.51",
 ]
 

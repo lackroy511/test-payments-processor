@@ -23,6 +23,11 @@ class Settings(BaseSettings):
 
     access_api_key: str
     access_api_name: str = "X-API-Key"
+    
+    rabbitmq_default_user: str
+    rabbitmq_default_pass: str
+    rabbitmq_host: str
+    rabbitmq_port: int
 
     @computed_field
     @property
