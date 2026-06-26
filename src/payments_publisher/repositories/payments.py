@@ -1,11 +1,11 @@
+from typing import Self
 from uuid import UUID
-from sqlalchemy import select, update, func
-from sqlalchemy.ext.asyncio import AsyncSession
+
+from sqlalchemy import func, select, update
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.core.db.models import OutboxMessage, OutboxMessageStatus
 from src.payments_publisher.repositories.dto import OutboxMessageDTO
-from sqlalchemy.ext.asyncio import async_sessionmaker
-from typing import Self
 
 
 class PublisherOutboxRepository:

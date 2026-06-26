@@ -1,8 +1,3 @@
-from src.payments_api.payments.v1.interfaces import (
-    PaymentRepoInterface,
-    OutboxMessageRepoInterface,
-    PaymentsUnitOfWorkInterface,
-)
 from typing import Annotated, Self
 from uuid import UUID
 
@@ -21,6 +16,11 @@ from src.payments_api.payments.v1.dto import (
     OutboxMessageResponseDTO,
     PaymentCreateDTO,
     PaymentResponseDTO,
+)
+from src.payments_api.payments.v1.interfaces import (
+    OutboxMessageRepoInterface,
+    PaymentRepoInterface,
+    PaymentsUnitOfWorkInterface,
 )
 
 

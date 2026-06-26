@@ -7,6 +7,14 @@
             "program": "${workspaceFolder}/src/payments_api/main.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run publisher",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/payments_publisher/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

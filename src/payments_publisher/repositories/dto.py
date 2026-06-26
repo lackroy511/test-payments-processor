@@ -1,6 +1,8 @@
 from datetime import datetime
 from uuid import UUID
+
 from pydantic import BaseModel
+
 from src.core.db.models import OutboxMessageStatus, OutboxMessageType
 
 

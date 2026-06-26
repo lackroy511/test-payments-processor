@@ -1,12 +1,13 @@
+from abc import ABC, abstractmethod
 from typing import Self
 from uuid import UUID
+
 from src.payments_api.payments.v1.dto import (
-    PaymentCreateDTO,
-    PaymentResponseDTO,
     OutboxMessageCreateDTO,
     OutboxMessageResponseDTO,
+    PaymentCreateDTO,
+    PaymentResponseDTO,
 )
-from abc import ABC, abstractmethod
 
 
 class PaymentRepoInterface(ABC):
