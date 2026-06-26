@@ -18,9 +18,9 @@ class Currency(str, Enum):
 
 
 class PaymentStatus(str, Enum):
-    PENDING = "pending"
-    SUCCEEDED = "succeeded"
-    FAILED = "failed"
+    PENDING = "PENDING"
+    SUCCEEDED = "SUCCEEDED"
+    FAILED = "FAILED"
 
 
 class Payment(Base):
@@ -60,12 +60,12 @@ class Payment(Base):
 
 
 class OutboxMessageStatus(str, Enum):
-    PENDING = "pending"
-    PUBLISHED = "published"
+    PENDING = "PENDING"
+    PUBLISHED = "PUBLISHED"
 
 
 class OutboxMessageType(str, Enum):
-    PAYMENT_CREATED = "payment.created"
+    PAYMENT_CREATED = "PAYMENT_CREATED"
 
 
 class OutboxMessage(Base):
