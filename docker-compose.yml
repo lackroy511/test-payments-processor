@@ -34,7 +34,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: test-payments-processor-api
-    command: python src/payments_api/main.py
+    command: /bin/sh -c 'alembic upgrade head && python src/payments_api/main.py'
     ports:
       - "8000:8000"
     env_file:
@@ -51,7 +51,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: test-payments-processor-publisher
-    command: python src/payments_publisher/main.py
+    command: /bin/sh -c 'for i in $(seq 1 5); do python src/payments_publisher/main.py && exit 0; sleep 2; done; exit 1'
     env_file:
       - .env
     depends_on:
@@ -66,7 +66,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: test-payments-processor-consumer
-    command: python src/payments_consumer/main.py
+    command: /bin/sh -c 'for i in $(seq 1 5); do python src/payments_consumer/main.py && exit 0; sleep 2; done; exit 1'
     env_file:
       - .env
     depends_on:
