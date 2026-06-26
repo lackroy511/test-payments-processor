@@ -15,6 +15,14 @@
             "program": "${workspaceFolder}/src/payments_publisher/main.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run consumer",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/payments_consumer/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
