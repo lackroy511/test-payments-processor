@@ -11,14 +11,14 @@ from src.core.db.models import OutboxMessageType
 from src.payments_publisher.repositories.payments import PublisherUnitOfWork
 from src.payments_publisher.services.payments import PublisherService
 
-logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 broker = RabbitBroker(settings.rabbit_url)
 
 app = FastStream(broker)
 
-keep_running = True
+shutdown_event = asyncio.Event()
+worker_task: asyncio.Task | None = None
 
 
 async def outbox_worker(broker: RabbitBroker) -> None:
@@ -37,27 +37,34 @@ async def outbox_worker(broker: RabbitBroker) -> None:
 
     log.info("Starting Outbox Poller...")
 
-    while keep_running:
-        processed_count = None
+    while not shutdown_event.is_set():
         try:
             processed_count = await service.process_outbox_messages()
         except Exception as e:
             log.error("Error in outbox worker: %s", e)
+            await asyncio.sleep(1.0)
+            continue
 
-        if processed_count is None:
+        if processed_count == 0:
             await asyncio.sleep(1.0)
 
 
 @app.on_startup
 async def setup_publisher() -> None:
-    asyncio.create_task(outbox_worker(broker))
+    global worker_task
+    worker_task = asyncio.create_task(outbox_worker(broker))
 
 
 @app.on_shutdown
 async def shutdown_publisher() -> None:
-    global keep_running
-    keep_running = False
     log.info("Shutting down Outbox Poller...")
+    shutdown_event.set()
+    if worker_task is not None:
+        try:
+            await asyncio.wait_for(worker_task, timeout=30.0)
+        except TimeoutError:
+            log.warning("Outbox worker did not finish within timeout, cancelling...")
+            worker_task.cancel()
 
 
 if __name__ == "__main__":

@@ -1,11 +1,9 @@
 from datetime import datetime
-from typing import AsyncGenerator
 from uuid import UUID, uuid7
 
 from sqlalchemy import DateTime, MetaData, Uuid, func
 from sqlalchemy.ext.asyncio import (
     AsyncAttrs,
-    AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )

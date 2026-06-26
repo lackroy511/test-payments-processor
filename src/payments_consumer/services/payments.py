@@ -26,6 +26,9 @@ class ConsumerService:
     )
     async def process_payment(self, payment_id: UUID) -> None:
         async with self._uow as uow:
+            if not await uow.processed_repo.try_mark_as_processed(payment_id):
+                return
+
             payment = await uow.payment_repo.get_by_id(payment_id)
 
             if payment is None:
@@ -41,11 +44,11 @@ class ConsumerService:
                 )
 
                 await uow.payment_repo.update_status(payment_id, new_status)
-                await uow.commit()
 
                 payment.status = new_status
 
             await self._send_webhook(payment.webhook_url, payment_id, payment.status)
+            await uow.commit()
 
     async def _send_webhook(
         self,

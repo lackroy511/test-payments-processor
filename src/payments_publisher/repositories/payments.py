@@ -17,6 +17,7 @@ class PublisherOutboxRepository:
             select(OutboxMessage)
             .where(OutboxMessage.status == OutboxMessageStatus.PENDING)
             .limit(limit)
+            .order_by(OutboxMessage.created_at.asc())
             .with_for_update(skip_locked=True)
         )
         result = await self._session.execute(stmt)

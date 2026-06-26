@@ -1,10 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
+from uuid import UUID
 
 from sqlalchemy import DateTime
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy import Numeric, String, Text
+from sqlalchemy import Numeric, String, Text, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -66,6 +67,16 @@ class OutboxMessageStatus(str, Enum):
 
 class OutboxMessageType(str, Enum):
     PAYMENT_CREATED = "PAYMENT_CREATED"
+
+
+class ProcessedPayment(Base):
+    __tablename__ = "processed_payments"
+
+    payment_id: Mapped[UUID] = mapped_column(
+        Uuid,
+        unique=True,
+        index=True,
+    )
 
 
 class OutboxMessage(Base):

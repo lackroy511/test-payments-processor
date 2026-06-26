@@ -29,8 +29,9 @@ class PublisherService:
             messages = await uow.outbox_repo.get_pending_batch(limit=batch_size)
 
             if not messages:
-                return len(messages)
+                return 0
 
+            processed = 0
             for msg in messages:
                 try:
                     await self._broker.publish(
@@ -39,9 +40,11 @@ class PublisherService:
                         routing_key=msg.event_type.value,
                     )
                     await uow.outbox_repo.mark_as_published(msg.id)
-                    await uow.commit()
+                    processed += 1
                 except Exception:
                     log.exception("Failed to publish message %s:", msg.id)
-                    raise
 
-            return len(messages)
+            if processed > 0:
+                await uow.commit()
+
+            return processed
