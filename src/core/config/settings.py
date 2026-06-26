@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     @property
     def db_url(self) -> str:
         return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.db_host}:{self.db_port}/{self.postgres_db}"  # noqa: E501
+    
+    @computed_field
+    @property
+    def rabbit_url(self) -> str:
+        return f"amqp://{self.rabbitmq_default_user}:{self.rabbitmq_default_pass}@{self.rabbitmq_host}:{self.rabbitmq_port}"  # noqa: E501
 
 
 settings = Settings()  # ty: ignore
