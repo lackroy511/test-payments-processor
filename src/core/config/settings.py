@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     access_api_key: str
     access_api_name: str = "X-API-Key"
-    
+
     rabbitmq_default_user: str
     rabbitmq_default_pass: str
     rabbitmq_host: str
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     @property
     def db_url(self) -> str:
         return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.db_host}:{self.db_port}/{self.postgres_db}"  # noqa: E501
-    
+
     @computed_field
     @property
     def rabbit_url(self) -> str:
