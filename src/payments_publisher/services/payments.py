@@ -1,11 +1,11 @@
-from aiormq import AMQPConnectionError, ConnectionClosed
-from sqlalchemy.exc import OperationalError, DBAPIError
-from src.core.utils.backoff import Backoff
 import logging
 
+from aiormq import AMQPConnectionError, ConnectionClosed
 from faststream.rabbit import RabbitBroker
+from sqlalchemy.exc import DBAPIError, OperationalError
 
 from src.core.broker.rabbitmq import payments_exchange
+from src.core.utils.backoff import Backoff
 from src.payments_publisher.repositories.payments import PublisherUnitOfWork
 
 log = logging.getLogger(__name__)

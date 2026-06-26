@@ -1,5 +1,6 @@
-from src.core.db.models import OutboxMessageType
 from faststream.rabbit import RabbitExchange, RabbitQueue
+
+from src.core.db.models import OutboxMessageType
 
 payments_exchange = RabbitExchange("payments_exchange", auto_delete=False)
 

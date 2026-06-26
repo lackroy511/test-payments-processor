@@ -1,13 +1,13 @@
-from src.core.db.models import OutboxMessageType
-from src.core.broker.rabbitmq import payments_exchange, dlq_queue, payments_new_queue
 import asyncio
 import logging
 
 from faststream import FastStream
 from faststream.rabbit import RabbitBroker
 
+from src.core.broker.rabbitmq import dlq_queue, payments_exchange, payments_new_queue
 from src.core.config.settings import settings
 from src.core.db.base import get_db_sessionmaker
+from src.core.db.models import OutboxMessageType
 from src.payments_publisher.repositories.payments import PublisherUnitOfWork
 from src.payments_publisher.services.payments import PublisherService
 
