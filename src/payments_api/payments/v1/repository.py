@@ -1,13 +1,17 @@
-from abc import ABC, abstractmethod
-from typing import Annotated
+from src.payments_api.payments.v1.interfaces import (
+    PaymentRepoInterface,
+    OutboxMessageRepoInterface,
+    PaymentsUnitOfWorkInterface,
+)
+from typing import Annotated, Self
 from uuid import UUID
 
 from fastapi import Depends
 from sqlalchemy import insert, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.core.db.base import get_db_session
+from src.core.db.base import get_db_sessionmaker
 from src.core.db.models import OutboxMessage, Payment
 from src.payments_api.common.exc.exceptions import (
     PaymentNotFoundError,
@@ -18,25 +22,6 @@ from src.payments_api.payments.v1.dto import (
     PaymentCreateDTO,
     PaymentResponseDTO,
 )
-
-
-class PaymentRepoInterface(ABC):
-    @abstractmethod
-    async def get_or_create(
-        self,
-        dto: PaymentCreateDTO,
-    ) -> tuple[PaymentResponseDTO, bool]: ...
-
-    @abstractmethod
-    async def get_by_id(self, payment_id: UUID) -> PaymentResponseDTO: ...
-
-
-class OutboxMessageRepoInterface(ABC):
-    @abstractmethod
-    async def create(
-        self,
-        dto: OutboxMessageCreateDTO,
-    ) -> OutboxMessageResponseDTO: ...
 
 
 class PaymentRepository(PaymentRepoInterface):
@@ -133,13 +118,36 @@ class OutboxMessageRepository(OutboxMessageRepoInterface):
         )
 
 
-async def get_payment_repository(
-    session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> PaymentRepoInterface:
-    return PaymentRepository(session)
+class PaymentsUnitOfWork(PaymentsUnitOfWorkInterface):
+    def __init__(self, sessionmaker: async_sessionmaker) -> None:
+        self.sessionmaker = sessionmaker
+
+    async def __aenter__(self) -> Self:
+        session = self.sessionmaker()
+        self._session = session
+        self.payment_repo = PaymentRepository(self._session)
+        self.outbox_repo = OutboxMessageRepository(self._session)
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object | None,
+    ) -> None:
+        if exc_type is not None:
+            await self.rollback()
+
+        await self._session.close()
+
+    async def commit(self) -> None:
+        await self._session.commit()
+
+    async def rollback(self) -> None:
+        await self._session.rollback()
 
 
-async def get_outbox_message_repository(
-    session: Annotated[AsyncSession, Depends(get_db_session)],
-) -> OutboxMessageRepoInterface:
-    return OutboxMessageRepository(session)
+async def get_payment_uow(
+    sessionmaker: Annotated[async_sessionmaker, Depends(get_db_sessionmaker)],
+) -> PaymentsUnitOfWorkInterface:
+    return PaymentsUnitOfWork(sessionmaker=sessionmaker)

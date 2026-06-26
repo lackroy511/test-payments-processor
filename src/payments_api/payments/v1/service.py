@@ -1,3 +1,6 @@
+from src.core.utils.backoff import Backoff
+from sqlalchemy.exc import OperationalError, DBAPIError
+from src.payments_api.payments.v1.interfaces import PaymentsUnitOfWorkInterface
 from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
@@ -11,22 +14,18 @@ from src.payments_api.payments.v1.dto import (
     PaymentResponseDTO,
 )
 from src.payments_api.payments.v1.repository import (
-    OutboxMessageRepoInterface,
-    PaymentRepoInterface,
-    get_outbox_message_repository,
-    get_payment_repository,
+    get_payment_uow,
 )
 
 
 class PaymentService:
     def __init__(
         self,
-        payment_repo: PaymentRepoInterface,
-        outbox_repo: OutboxMessageRepoInterface,
+        uow: PaymentsUnitOfWorkInterface,
     ) -> None:
-        self._payment_repo = payment_repo
-        self._outbox_repo = outbox_repo
+        self._uow = uow
 
+    @Backoff(exceptions=(OperationalError, DBAPIError))
     async def create_payment(
         self,
         amount: Decimal,
@@ -36,36 +35,35 @@ class PaymentService:
         description: str | None = None,
         meta_data: dict | None = None,
     ) -> PaymentResponseDTO:
-        payment_dto = PaymentCreateDTO(
-            amount=amount,
-            currency=currency,
-            idempotency_key=idempotency_key,
-            webhook_url=webhook_url,
-            description=description,
-            meta_data=meta_data,
-        )
-        payment, is_created = await self._payment_repo.get_or_create(payment_dto)
-        if is_created:
-            outbox_dto = OutboxMessageCreateDTO(
-                event_type=OutboxMessageType.PAYMENT_CREATED,
-                payload={"payment_id": str(payment.id)},
+        async with self._uow as uow:
+            payment_dto = PaymentCreateDTO(
+                amount=amount,
+                currency=currency,
+                idempotency_key=idempotency_key,
+                webhook_url=webhook_url,
+                description=description,
+                meta_data=meta_data,
             )
-            await self._outbox_repo.create(outbox_dto)
+            payment, is_created = await uow.payment_repo.get_or_create(
+                payment_dto,
+            )
+            if is_created:
+                outbox_dto = OutboxMessageCreateDTO(
+                    event_type=OutboxMessageType.PAYMENT_CREATED,
+                    payload={"payment_id": str(payment.id)},
+                )
+                await uow.outbox_repo.create(outbox_dto)
 
-        return payment
+            await uow.commit()
+
+            return payment
 
     async def get_payment(self, payment_id: UUID) -> PaymentResponseDTO:
-        return await self._payment_repo.get_by_id(payment_id)
+        async with self._uow as uow:
+            return await uow.payment_repo.get_by_id(payment_id)
 
 
 async def get_payment_service(
-    payment_repo: Annotated[
-        PaymentRepoInterface,
-        Depends(get_payment_repository),
-    ],
-    outbox_repo: Annotated[
-        OutboxMessageRepoInterface,
-        Depends(get_outbox_message_repository),
-    ],
+    uow: Annotated[PaymentsUnitOfWorkInterface, Depends(get_payment_uow)],
 ) -> PaymentService:
-    return PaymentService(payment_repo, outbox_repo)
+    return PaymentService(uow=uow)

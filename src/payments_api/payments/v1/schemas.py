@@ -2,13 +2,13 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from src.core.db.models import Currency, PaymentStatus
 
 
 class CreatePaymentRequest(BaseModel):
-    amount: Decimal
+    amount: Decimal = Field(..., gt=0)
     currency: Currency
     description: str | None = None
     meta_data: dict | None = None
