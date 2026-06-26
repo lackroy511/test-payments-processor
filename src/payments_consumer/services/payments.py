@@ -62,6 +62,7 @@ class ConsumerService:
             payment_id,
             status,
         )
+        await asyncio.sleep(0.1)
         # async with httpx.AsyncClient() as client:
         #     response = await client.post(
         #         url,
