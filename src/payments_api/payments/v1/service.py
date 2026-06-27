@@ -9,9 +9,9 @@ from src.core.db.models import Currency, OutboxMessageType
 from src.core.utils.backoff import Backoff
 from src.payments_api.payments.v1.dto import (
     OutboxMessageCreateDTO,
+    OutboxMessagePayloadDTO,
     PaymentCreateDTO,
     PaymentResponseDTO,
-    OutboxMessagePayloadDTO,
 )
 from src.payments_api.payments.v1.interfaces import PaymentsUnitOfWorkInterface
 from src.payments_api.payments.v1.repository import (

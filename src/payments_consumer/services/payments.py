@@ -1,13 +1,13 @@
-from decimal import Decimal
 import asyncio
 import logging
 import random
+from decimal import Decimal
 from uuid import UUID, uuid7
 
 import httpx
 from sqlalchemy.exc import DBAPIError, OperationalError
 
-from src.core.db.models import PaymentStatus, Currency
+from src.core.db.models import Currency, PaymentStatus
 from src.core.utils.backoff import Backoff
 from src.payments_consumer.repositories.payments import ConsumerUnitOfWork
 

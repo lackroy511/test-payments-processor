@@ -1,9 +1,11 @@
-from datetime import datetime, timezone, timedelta
 import asyncio
 import logging
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
-from src.core.db.models import PaymentStatus
+
 import httpx
+
+from src.core.db.models import PaymentStatus
 from src.core.utils.backoff import Backoff
 from src.payments_consumer.repositories.payments import ConsumerUnitOfWork
 
