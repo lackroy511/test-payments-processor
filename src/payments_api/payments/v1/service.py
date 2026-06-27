@@ -11,6 +11,7 @@ from src.payments_api.payments.v1.dto import (
     OutboxMessageCreateDTO,
     PaymentCreateDTO,
     PaymentResponseDTO,
+    OutboxMessagePayloadDTO,
 )
 from src.payments_api.payments.v1.interfaces import PaymentsUnitOfWorkInterface
 from src.payments_api.payments.v1.repository import (
@@ -50,7 +51,7 @@ class PaymentService:
             if is_created:
                 outbox_dto = OutboxMessageCreateDTO(
                     event_type=OutboxMessageType.PAYMENT_CREATED,
-                    payload={"payment_id": str(payment.id)},
+                    payload=OutboxMessagePayloadDTO(payment_id=str(payment.id)),
                 )
                 await uow.outbox_repo.create(outbox_dto)
 

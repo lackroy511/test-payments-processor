@@ -1,11 +1,10 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from uuid import UUID
 
 from sqlalchemy import DateTime
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy import Numeric, String, Text, Uuid
+from sqlalchemy import Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -20,19 +19,22 @@ class Currency(str, Enum):
 
 class PaymentStatus(str, Enum):
     PENDING = "PENDING"
-    SUCCEEDED = "SUCCEEDED"
     FAILED = "FAILED"
+    SUCCEEDED = "SUCCEEDED"
 
 
 class Payment(Base):
     __tablename__ = "payments"
 
+    external_id: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
     amount: Mapped[Decimal] = mapped_column(
         Numeric(precision=14, scale=2),
     )
     currency: Mapped[Currency] = mapped_column(
         SAEnum(Currency),
-        index=True,
     )
     description: Mapped[str | None] = mapped_column(
         Text,
@@ -49,14 +51,22 @@ class Payment(Base):
     idempotency_key: Mapped[str] = mapped_column(
         String(64),
         unique=True,
-        index=True,
     )
     webhook_url: Mapped[str] = mapped_column(
         Text,
     )
+    is_webhook_sent: Mapped[bool] = mapped_column(
+        default=False,
+        index=True,
+    )
+    is_processed: Mapped[bool] = mapped_column(
+        default=False,
+        index=True,
+    )
     processed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
+        index=True,
     )
 
 
@@ -67,16 +77,6 @@ class OutboxMessageStatus(str, Enum):
 
 class OutboxMessageType(str, Enum):
     PAYMENT_CREATED = "PAYMENT_CREATED"
-
-
-class ProcessedPayment(Base):
-    __tablename__ = "processed_payments"
-
-    payment_id: Mapped[UUID] = mapped_column(
-        Uuid,
-        unique=True,
-        index=True,
-    )
 
 
 class OutboxMessage(Base):

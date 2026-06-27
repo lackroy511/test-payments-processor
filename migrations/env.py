@@ -9,7 +9,7 @@ from alembic import context
 from src.core.config.settings import settings
 from src.core.db.base import Base
 
-from src.core.db.models import Payment, ProcessedPayment
+from src.core.db.models import Payment
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.db_url)

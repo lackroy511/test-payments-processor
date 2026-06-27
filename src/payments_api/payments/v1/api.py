@@ -45,6 +45,7 @@ async def get_payment(
     payment = await service.get_payment(payment_id)
     return PaymentResponse(
         id=payment.id,
+        external_id=payment.external_id,
         amount=payment.amount,
         currency=payment.currency,
         description=payment.description,
@@ -52,6 +53,8 @@ async def get_payment(
         status=payment.status,
         idempotency_key=payment.idempotency_key,
         webhook_url=payment.webhook_url,
+        is_webhook_sent=payment.is_webhook_sent,
         created_at=payment.created_at,
+        is_processed=payment.is_processed,
         processed_at=payment.processed_at,
     )

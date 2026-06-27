@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Annotated, Self
 from uuid import UUID
 
@@ -38,6 +39,7 @@ class PaymentRepository(PaymentRepoInterface):
 
         return PaymentResponseDTO(
             id=row.id,
+            external_id=row.external_id,
             amount=row.amount,
             currency=row.currency,
             description=row.description,
@@ -45,7 +47,9 @@ class PaymentRepository(PaymentRepoInterface):
             status=row.status,
             idempotency_key=row.idempotency_key,
             webhook_url=row.webhook_url,
+            is_webhook_sent=row.is_webhook_sent,
             created_at=row.created_at,
+            is_processed=row.is_processed,
             processed_at=row.processed_at,
         )
 
@@ -79,6 +83,7 @@ class PaymentRepository(PaymentRepoInterface):
 
         return PaymentResponseDTO(
             id=row.id,
+            external_id=row.external_id,
             amount=row.amount,
             currency=row.currency,
             description=row.description,
@@ -86,7 +91,9 @@ class PaymentRepository(PaymentRepoInterface):
             status=row.status,
             idempotency_key=row.idempotency_key,
             webhook_url=row.webhook_url,
+            is_webhook_sent=row.is_webhook_sent,
             created_at=row.created_at,
+            is_processed=row.is_processed,
             processed_at=row.processed_at,
         ), is_created
 
@@ -100,7 +107,7 @@ class OutboxMessageRepository(OutboxMessageRepoInterface):
             insert(OutboxMessage)
             .values(
                 event_type=dto.event_type.value,
-                payload=dto.payload,
+                payload=asdict(dto.payload),
             )
             .returning(OutboxMessage)
         )

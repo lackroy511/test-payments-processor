@@ -24,6 +24,7 @@ class PaymentCreateDTO:
 @dataclass(frozen=True)
 class PaymentResponseDTO:
     id: UUID
+    external_id: str | None
     amount: Decimal
     currency: Currency
     description: str | None
@@ -31,14 +32,21 @@ class PaymentResponseDTO:
     status: PaymentStatus
     idempotency_key: str
     webhook_url: str
+    is_webhook_sent: bool
     created_at: datetime
+    is_processed: bool
     processed_at: datetime | None
 
 
 @dataclass(frozen=True)
 class OutboxMessageCreateDTO:
     event_type: OutboxMessageType
-    payload: dict
+    payload: OutboxMessagePayloadDTO
+
+
+@dataclass(frozen=True)
+class OutboxMessagePayloadDTO:
+    payment_id: str
 
 
 @dataclass(frozen=True)
