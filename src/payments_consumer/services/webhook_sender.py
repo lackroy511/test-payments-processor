@@ -13,6 +13,11 @@ log = logging.getLogger(__name__)
 
 
 class WebhookSender:
+    """
+    Mock Класс реализации отправки вебхуков.
+    В реальности я бы делал через Outbox + отдельный сервис для отправки вебхуков.
+    """
+    
     def __init__(self, uow: ConsumerUnitOfWork) -> None:
         self._uow = uow
 
@@ -27,25 +32,33 @@ class WebhookSender:
                             processed_after=processed_after,
                         )
                     )
-                    for payment in success_payments:
-                        await self._send_webhook(
-                            payment.webhook_url,
-                            payment.id,
-                            payment.status,
-                        )
-                        await uow.payment_repo.update_payment(
-                            payment.id,
-                            is_webhook_sent=True,
-                        )
-                        await uow.commit()
-                    
-                    if len(success_payments) == 0:
-                        await asyncio.sleep(1)
+                    results = await asyncio.gather(
+                        *(
+                            self._send_webhook(p.webhook_url, p.id, p.status)
+                            for p in success_payments
+                        ),
+                        return_exceptions=True,
+                    )
+
+                    for payment, result in zip(success_payments, results, strict=True):
+                        if result is None:
+                            await uow.payment_repo.update_payment(
+                                payment.id,
+                                is_webhook_sent=True,
+                            )
+                        else:
+                            log.error(
+                                "Webhook sending failed for payment %s: %s",
+                                payment.id,
+                                result,
+                            )
+
+                    await uow.commit()
 
                 except Exception:
                     log.exception("Error while sending webhooks: ")
 
-    @Backoff(exceptions=(httpx.HTTPError,))
+    @Backoff(exceptions=(httpx.RequestError,))
     async def _send_webhook(
         self,
         url: str,

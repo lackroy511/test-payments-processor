@@ -60,7 +60,7 @@ async def setup() -> None:
     sessionmaker = await get_db_sessionmaker()
     webhook_uow = ConsumerUnitOfWork(sessionmaker=sessionmaker)
     webhook_sender = WebhookSender(uow=webhook_uow)
-    _webhook_task = asyncio.create_task(webhook_sender.run())
+    webhook_worker = asyncio.create_task(webhook_sender.run())
 
 
 @app.on_shutdown

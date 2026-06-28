@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 from src.core.db.models import Currency, PaymentStatus
 
@@ -26,7 +26,7 @@ class PaymentResponse(BaseModel):
     meta_data: dict | None
     status: PaymentStatus
     idempotency_key: str
-    webhook_url: str
+    webhook_url: HttpUrl
     is_webhook_sent: bool
     created_at: datetime
     is_processed: bool
